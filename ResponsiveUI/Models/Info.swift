@@ -20,8 +20,8 @@ struct Info: Identifiable {
 }
 
 var infos: [Info] = [
-    Info(title: "Revenue", amount: "2.047", percentage: 10, icon: "arrow.up.right", iconColor: .orange),
-    Info(title: "Orders", amount: "356", percentage: 20, icon: "cart", iconColor: .green),
-    Info(title: "Dine In", amount: "220", percentage: 10, icon: "fork.knife", iconColor: .red),
-    Info(title: "Take away", amount: "135", percentage: 5, loss: true, icon: "takeoutbag.and.cup.and.straw.fill", iconColor: .yellow)
+    Info(title: "Revenue", amount: "$2.047", percentage: 10, icon: "arrow.up.right", iconColor: .orange),
+    Info(title: "Orders", amount: "$356", percentage: 20, icon: "cart", iconColor: .green),
+    Info(title: "Dine In", amount: "$220", percentage: 10, icon: "fork.knife", iconColor: .red),
+    Info(title: "Take away", amount: "$135", percentage: 5, loss: true, icon: "takeoutbag.and.cup.and.straw.fill", iconColor: .yellow)
 ]

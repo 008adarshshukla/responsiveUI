@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Charts
 
 struct Home: View {
     
@@ -30,6 +31,16 @@ struct Home: View {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack {
                     HeaderView()
+                    InfoCards()
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 20) {
+                            dailySalesView()
+                            PieChartView()
+                        }
+                        .padding(.horizontal, 15)
+                    }
+                    .padding(.horizontal, -15)
                 }
                 .padding(15)
             }
@@ -64,6 +75,163 @@ struct Home: View {
                 
             }
         }
+    }
+    
+    //MARK: Pie-Chart View
+    @ViewBuilder
+    func PieChartView() -> some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("Total Income")
+                .font(.title3.bold())
+            
+            ZStack {
+                Circle()
+                    .trim(from: 0.5, to: 1)
+                    .stroke(.red, style: StrokeStyle(lineWidth: 15, lineCap: .round, lineJoin: .round))
+                Circle()
+                    .trim(from: 0.2, to: 0.5)
+                    .stroke(.yellow, style: StrokeStyle(lineWidth: 15, lineCap: .round, lineJoin: .round))
+                Circle()
+                    .trim(from: 0, to: 0.2)
+                    .stroke(.green, style: StrokeStyle(lineWidth: 15, lineCap: .round, lineJoin: .round))
+                
+                Text("$200k")
+                    .font(.title)
+                    .fontWeight(.heavy)
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            HStack(spacing: 15) {
+                Label {
+                    Text("Food")
+                        .font(.caption)
+                        .foregroundColor(.black)
+                } icon: {
+                    Image(systemName: "circle.fill")
+                        .font(.caption2)
+                        .foregroundColor(.green)
+                }
+                
+                Label {
+                    Text("Drinks")
+                        .font(.caption)
+                        .foregroundColor(.black)
+                } icon: {
+                    Image(systemName: "circle.fill")
+                        .font(.caption2)
+                        .foregroundColor(.red)
+                }
+                
+                Label {
+                    Text("Others")
+                        .font(.caption)
+                        .foregroundColor(.black)
+                } icon: {
+                    Image(systemName: "circle.fill")
+                        .font(.caption2)
+                        .foregroundColor(.yellow)
+                }
+
+            }
+        }
+        .frame(width: 250, height: 221)
+        .padding(15)
+        .background {
+            RoundedRectangle(cornerRadius: 15)
+                .fill(.white)
+        }
+    }
+    
+    //MARK: Graph View
+    @ViewBuilder
+    func dailySalesView() -> some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("Daily Sales")
+                .font(.title3.bold())
+            
+            Chart {
+                ForEach(dailySales) { sale in
+                    
+                    //MARK: Area Mark for shadow.
+                    AreaMark(x: .value("Time", sale.time),
+                             y: .value("Sale", sale.sales)
+                    )
+                    .foregroundStyle(.linearGradient(
+                        colors: [Color.orange.opacity(0.6),Color.orange.opacity(0.5), Color.orange.opacity(0.3), Color.orange.opacity(0.1)],
+                        startPoint: .top,
+                        endPoint: .bottom)
+                    )
+                    .interpolationMethod(.catmullRom)
+                    
+                    //MARK: Line Mark
+                    LineMark(x: .value("Time", sale.time),
+                             y: .value("Sale", sale.sales)
+                    )
+                    .foregroundStyle(Color.orange)
+                    .interpolationMethod(.catmullRom)
+                    
+                    //MARK: Point Mark to show the points
+                    PointMark(x: .value("Time", sale.time),
+                             y: .value("Sale", sale.sales)
+                    )
+                    .foregroundStyle(Color.orange)
+                }
+            }
+            .frame(height: 180)
+        }
+        .padding(15)
+        .background(content: {
+            RoundedRectangle(cornerRadius: 15)
+                .fill(.white)
+        })
+        .frame(minWidth: props.size.width - 30)
+    }
+    
+    //MARK: Info Cards View.
+    @ViewBuilder
+    func InfoCards() -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 18) {
+                ForEach(infos) { info in
+                    VStack(alignment: .leading, spacing: 18) {
+                        HStack(spacing: 15) {
+                            Text(info.title)
+                                .font(.title3.bold())
+                            
+                            Spacer()
+                            HStack(spacing: 8) {
+                                Image(systemName: info.loss ? "arrow.down" : "arrow.up")
+                                Text("\(info.percentage)%")
+                            }
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(info.loss ? .red : .green)
+                        }
+                        HStack(spacing: 18) {
+                            Image(systemName: info.icon)
+                                .font(.title3)
+                                .foregroundColor(.white)
+                                .frame(width: 45, height: 45)
+                                .background {
+                                    Circle()
+                                        .fill(info.iconColor)
+                                }
+                            
+                            Text(info.amount)
+                                .font(.title.bold())
+                        }
+                    }
+                    .padding()
+                    .background {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(.white)
+                    }
+                }
+            }
+            .padding(15)
+        }
+        .padding(.horizontal, -15)
     }
     
     //MARK: Header View
