@@ -18,7 +18,7 @@ struct Home: View {
     var body: some View {
         HStack(spacing: 0) {
             //MARK: showing only for iPad
-            if props.isiPad {
+            if props.isAdoptable {
                 ViewThatFits {
                     ScrollView(.vertical, showsIndicators: false) {
                         SideBar()
@@ -26,6 +26,11 @@ struct Home: View {
                     .background(
                         Color.white.ignoresSafeArea()
                     )
+                }
+                .onAppear {
+                    withAnimation(.easeInOut) {
+                        showSideBar = false
+                    }
                 }
             }
             ScrollView(.vertical, showsIndicators: false) {
@@ -41,6 +46,8 @@ struct Home: View {
                         .padding(.horizontal, 15)
                     }
                     .padding(.horizontal, -15)
+                    
+                    TrendingItemsView()
                 }
                 .padding(15)
             }
@@ -75,6 +82,67 @@ struct Home: View {
                 
             }
         }
+    }
+    
+    //MARK: Trending Items View
+    @ViewBuilder
+    func TrendingItemsView() -> some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("Trending Dishes")
+                .font(.title3.bold())
+                .padding(.bottom)
+            
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: props.isAdoptable ? 2 : 1), spacing: props.isAdoptable ? 20 : 15) {
+                
+                ForEach(trendingDishes) { item in
+                    HStack(spacing: 15) {
+                        Image(item.image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 35, height: 35)
+                            .padding(10)
+                            .background {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(.orange.opacity(0.1))
+                            }
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(item.title)
+                                .fontWeight(.bold)
+                                .lineLimit(1)
+                            Label {
+                                Text(item.title)
+                                    .foregroundColor(.orange)
+                            } icon: {
+                                Text("\(item.subTitle)")
+                                    .foregroundColor(.gray)
+                            }
+                            .font(.callout)
+                            .fontWeight(.semibold)
+                        }
+                        .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .topTrailing, content: {
+            Button("View All") {
+                
+            }
+            .font(.caption)
+            .fontWeight(.semibold)
+            .foregroundColor(.orange)
+            .offset(y: 6)
+        })
+        .padding(15)
+        .background {
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .fill(.white)
+            
+        }
+        .padding(.top, 10)
     }
     
     //MARK: Pie-Chart View
@@ -132,7 +200,7 @@ struct Home: View {
                         .font(.caption2)
                         .foregroundColor(.yellow)
                 }
-
+                
             }
         }
         .frame(width: 250, height: 221)
@@ -173,7 +241,7 @@ struct Home: View {
                     
                     //MARK: Point Mark to show the points
                     PointMark(x: .value("Time", sale.time),
-                             y: .value("Sale", sale.sales)
+                              y: .value("Sale", sale.sales)
                     )
                     .foregroundStyle(Color.orange)
                 }
@@ -185,7 +253,8 @@ struct Home: View {
             RoundedRectangle(cornerRadius: 15)
                 .fill(.white)
         })
-        .frame(minWidth: props.size.width - 30)
+        //MARK: 400 -> side bar(100) + padding(30) + piechart view(250)+spacing(20)
+        .frame(minWidth: props.isAdoptable ? props.size.width - 400 : props.size.width - 30)
     }
     
     //MARK: Info Cards View.
@@ -252,7 +321,7 @@ struct Home: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             
             HStack(spacing: 10) {
-                if !(props.isiPad && !props.isMaxSplit) {
+                if !props.isAdoptable {
                     Button {
                         withAnimation(.easeInOut) {
                             showSideBar.toggle()
@@ -261,17 +330,14 @@ struct Home: View {
                         Image(systemName: "line.3.horizontal")
                             .font(.title2)
                             .foregroundColor(.black)
-                        
                     }
-                    
-                    TextField("Search", text: .constant(""))
-                    
-                    Image(systemName: "magnifyingglass")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 22, height: 22)
-                    
                 }
+                TextField("Search", text: .constant(""))
+                
+                Image(systemName: "magnifyingglass")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 22, height: 22)
             }
             .padding(.horizontal, 15)
             .padding(.vertical, 10)

@@ -21,8 +21,9 @@ struct ResponsiveView<Content: View>: View {
             let isLandscape = size.width > size.height
             let isIPad = UIDevice.current.userInterfaceIdiom == .pad
             let isMaxSplit = isSplit() && size.width < 400
+            let isAdoptable = isIPad && (isLandscape ? !isMaxSplit : !isSplit())
             
-            let properties = Properties(isLandscape: isLandscape, isiPad: isIPad, isSplit: isSplit(), isMaxSplit: isMaxSplit, size: size)
+            let properties = Properties(isLandscape: isLandscape, isiPad: isIPad, isSplit: isSplit(), isMaxSplit: isMaxSplit, isAdoptable: isAdoptable, size: size)
             
             content(properties)
                 .frame(width: size.width, height: size.height)
@@ -49,5 +50,6 @@ struct Properties {
     var isSplit: Bool
     //MARK: if the app size is reduced to more than 1/3 in split mode on iPad
     var isMaxSplit: Bool
+    var isAdoptable: Bool
     var size: CGSize
 }
